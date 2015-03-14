@@ -2,7 +2,7 @@
 /**
  * Downward compatible, touchable dial
  *
- * Version: 1.2.11
+ * Based on Version: 1.2.11 - Added 'tick' support
  * Requires: jQuery v1.7+
  *
  * Copyright (c) 2012 Anthony Terrien
@@ -120,7 +120,15 @@
                     inline: false,
                     step: this.$.data('step') || 1,
                     rotation: this.$.data('rotation'),
-
+                    
+                    // Ticks
+                    tickColor : this.$.data('tickColor') || '#DDDDDD'
+                    ,ticks : this.$.data('ticks') || 0
+                    ,tickLength : this.$.data('tickLength') || 2
+                    ,tickWidth : this.$.data('tickWidth') || 0.04
+                    ,tickColorizeValues : this.$.data('tickColorizeValues') || true
+                    ,
+                    
                     // Hooks
                     draw: null, // function () {}
                     change: null, // function (value) {}
@@ -760,15 +768,15 @@
                 a = this.arc(this.cv),      // Arc
                 pa,                         // Previous arc
                 r = 1;
-
+                
+            
             c.lineWidth = this.lineWidth;
             c.lineCap = this.lineCap;
-
             if (this.o.bgColor !== "none") {
-                c.beginPath();
+                    c.beginPath();
                     c.strokeStyle = this.o.bgColor;
                     c.arc(this.xy, this.xy, this.radius, this.endAngle - 0.00001, this.startAngle + 0.00001, true);
-                c.stroke();
+                    c.stroke();
             }
 
             if (this.o.displayPrevious) {
@@ -784,6 +792,24 @@
             c.strokeStyle = r ? this.o.fgColor : this.fgColor ;
             c.arc(this.xy, this.xy, this.radius, a.s, a.e, a.d);
             c.stroke();
+
+             var ticks = this.o.ticks;
+            if (ticks >  0)  {
+                var tl = this.o.tickLength;
+                var tw = this.o.tickWidth;
+                for(var tick = 0; tick < ticks; tick++) {
+                    c.beginPath();
+/*                    if (this.cv > (((2 * Math.PI) / ticks) * tick) && this.o.tickColorizeValues) {
+                        c.strokeStyle = this.o.bgColor;
+                    }
+                    else {
+ */                       c.strokeStyle = this.o.tickColor;
+    //                }
+                    var tick_sa = (((2 * Math.PI) / ticks) * tick) - (0.5 * Math.PI);
+                    c.arc( this.xy, this.xy, this.radius , tick_sa, tick_sa + tw , false);
+                    c.stroke();
+                }
+             }
         };
 
         this.cancel = function () {
